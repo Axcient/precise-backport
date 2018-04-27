@@ -1,0 +1,16 @@
+.git
+.gitignore
+*.deb
+*.tgz
+*.tar.gz
+output
+deploy
+ccache
+build.sh
+deploy.sh
+Makefile
+Readme.me
+LICENSE
+
+# Vim swap files
+**/.*.sw[po]
