@@ -1,0 +1,11 @@
+--- /tmp/unattended-upgrade	2014-01-03 08:00:44.962143452 +0000
++++ /usr/bin/unattended-upgrade	2014-01-03 08:00:49.010144637 +0000
+@@ -297,6 +297,8 @@
+             else:
+                 continue
+             changes = [pkg.name for pkg in cache.get_changes()]
++            if not changes:
++                continue
+             if len(changes) == 1:
+                 logging.debug("found leaf package %s" % pkg.name)
+                 smallest_partition = changes

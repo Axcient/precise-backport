@@ -50,7 +50,33 @@ ENV QUILT_PATCHES=debian/patches
 
 COPY build_backport.sh /scripts/
 
-# Will build stuff here
+# Build unattended-upgrade package with fix for cpu-pinning bug
+RUN sudo apt-get update \
+  && apt-src install unattended-upgrades
+ARG new_uu_version="0.82.1ubuntu1"
+ARG old_uu_version="0.76ubuntu1.3"
+ARG uu_dir="unattended-upgrades-${old_uu_version}"
+
+RUN debchange \
+  --changelog ${uu_dir}/debian/changelog \
+  --newversion ${new_uu_version}~0${VERSION} \
+  --distribution ${DISTRIBUTION} \
+  --force-distribution \
+  "Backport cpu pinning bugfix from ${new_uu_version}."
+
+# Apply cpu-pinning-bug fix
+# See https://bugs.launchpad.net/ubuntu/+source/unattended-upgrades/+bug/1265729
+COPY ${uu_patch} /patches/
+ARG uu_patch="unattended-upgrade.patch"
+ARG uu_to_patch="unattended-upgrade"
+RUN patch ${uu_dir}/${uu_to_patch} /patches/${uu_patch}
+
+RUN cd ${uu_dir} \
+  && debuild -i -uc -us
+RUN rm -rf ${uu_dir}
+RUN ls /build/
+RUN rm -rf *${old_uu_version}*
+
 
 VOLUME /out
 
